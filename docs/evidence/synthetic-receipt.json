@@ -1,0 +1,503 @@
+{
+  "format": "ChangeReceipt",
+  "version": 1,
+  "purpose": "A comparison of supplied CSV snapshots, not verification of a physical inventory or an explanation of why changes occurred.",
+  "rules": {
+    "encoding": "UTF-8; optional leading BOM is preserved in originalBase64 and rawText and excluded only from header parsing.",
+    "csv": "Comma-delimited, first record headers; quoted fields may contain commas, doubled quotes and record endings. Only a terminal separator-created blank record is ignored.",
+    "identifiers": "Exact string equality. No trimming, case conversion, number conversion or guessed ID columns.",
+    "duplicateIds": "If either snapshot has multiple rows with an ID, the entire ID group is ambiguous. No matching is attempted for that group.",
+    "missingIds": "Empty-string and missing IDs are unresolved individual records. They are excluded from normal change counts.",
+    "values": "Mapped fields use exact string equality. Empty string is an existing empty cell; null is a missing cell or an explicitly unmapped side.",
+    "scope": "Only mapped fields participate. Other source columns are preserved but excluded. Quantities are compared as text; no totals or real-world movement are inferred.",
+    "counts": "Added, removed, changed and unchanged count unique unambiguous IDs. Ambiguous counts ID groups. InvalidKey counts individual source records.",
+    "ordering": "ID groups sort by JavaScript UTF-16 code unit order. Invalid-ID records follow in before-then-after source order.",
+    "records": "Record is a CSV record ordinal: header is 1, first data record is 2. A quoted multiline field does not create an extra record.",
+    "evidence": "originalBase64 preserves original file bytes. sha256 is the SHA-256 of those bytes. Fingerprints identify supplied bytes; they do not authenticate their origin."
+  },
+  "limits": {
+    "maxBytes": 2097152,
+    "maxRows": 10000,
+    "maxColumns": 64,
+    "maxCellChars": 20000
+  },
+  "sources": {
+    "before": {
+      "name": "handoff-before.csv",
+      "byteLength": 440,
+      "sha256": "e60053fa1ddd699d70c30d09b65337361ddde959b19697f982b7e35ce0e6bedf",
+      "originalBase64": "QXNzZXQgSUQsSXRlbSxMb2NhdGlvbixDb3VudCxOb3RlcwowMDAxLEZvbGRpbmcgdGFibGUsQ29tbXVuaXR5IGhhbGwsNCxTdXJmYWNlIGNoZWNrZWQKMDAwMixGaXJzdCBhaWQga2l0LFN1cHBseSBjdXBib2FyZCwyLCJTZWFsIGludGFjdCwgc3BhcmUgYmFuZGFnZXMgaW5zaWRlIgowMDAzLFZvbHVudGVlciB2ZXN0LFJhY2sgQSwxMiwiV2FzaGVkCkZvbGRlZCBieSBzaXplIgowMDA0LFdhdGVyIGp1ZyxLaXRjaGVuIHNoZWxmLDMsUmVhZHkgZm9yIGNvbGxlY3Rpb24KMDAwNixFeHRlbnNpb24gcmVlbCxCbHVlIGJpbiwxLFNob3J0IGNhYmxlCjAwMDYsRXh0ZW5zaW9uIHJlZWwsR3JlZW4gYmluLDEsTG9uZyBjYWJsZQosVW5sYWJlbGxlZCBjcmF0ZSxJbnRha2UgZGVzaywxLE5lZWRzIGFuIGFzc2V0IGxhYmVsCjAwMDgsTEVEIGxhbnRlcm4sQ2hhcmdpbmcgc2hlbGYsNgo=",
+      "rawText": "Asset ID,Item,Location,Count,Notes\n0001,Folding table,Community hall,4,Surface checked\n0002,First aid kit,Supply cupboard,2,\"Seal intact, spare bandages inside\"\n0003,Volunteer vest,Rack A,12,\"Washed\nFolded by size\"\n0004,Water jug,Kitchen shelf,3,Ready for collection\n0006,Extension reel,Blue bin,1,Short cable\n0006,Extension reel,Green bin,1,Long cable\n,Unlabelled crate,Intake desk,1,Needs an asset label\n0008,LED lantern,Charging shelf,6\n",
+      "headers": [
+        "Asset ID",
+        "Item",
+        "Location",
+        "Count",
+        "Notes"
+      ],
+      "rows": [
+        {
+          "record": 2,
+          "cells": [
+            "0001",
+            "Folding table",
+            "Community hall",
+            "4",
+            "Surface checked"
+          ]
+        },
+        {
+          "record": 3,
+          "cells": [
+            "0002",
+            "First aid kit",
+            "Supply cupboard",
+            "2",
+            "Seal intact, spare bandages inside"
+          ]
+        },
+        {
+          "record": 4,
+          "cells": [
+            "0003",
+            "Volunteer vest",
+            "Rack A",
+            "12",
+            "Washed\nFolded by size"
+          ]
+        },
+        {
+          "record": 5,
+          "cells": [
+            "0004",
+            "Water jug",
+            "Kitchen shelf",
+            "3",
+            "Ready for collection"
+          ]
+        },
+        {
+          "record": 6,
+          "cells": [
+            "0006",
+            "Extension reel",
+            "Blue bin",
+            "1",
+            "Short cable"
+          ]
+        },
+        {
+          "record": 7,
+          "cells": [
+            "0006",
+            "Extension reel",
+            "Green bin",
+            "1",
+            "Long cable"
+          ]
+        },
+        {
+          "record": 8,
+          "cells": [
+            "",
+            "Unlabelled crate",
+            "Intake desk",
+            "1",
+            "Needs an asset label"
+          ]
+        },
+        {
+          "record": 9,
+          "cells": [
+            "0008",
+            "LED lantern",
+            "Charging shelf",
+            "6",
+            null
+          ]
+        }
+      ],
+      "warnings": [
+        "1 data record has missing cells. Missing values are preserved separately from empty strings."
+      ]
+    },
+    "after": {
+      "name": "handoff-after.csv",
+      "byteLength": 447,
+      "sha256": "f6cd67cc537a2382f8265b23df7c1fd35470cb4dae1ad97019a3358f8848f34b",
+      "originalBase64": "SW52ZW50b3J5IElELERlc2NyaXB0aW9uLFN0b3JhZ2UsQ291bnQsTm90ZXMKMDAwMSxGb2xkaW5nIHRhYmxlLENvbW11bml0eSBoYWxsLDQsU3VyZmFjZSBjaGVja2VkCjAwMDIsRmlyc3QgYWlkIGtpdCxTdXBwbHkgY3VwYm9hcmQsMywiU2VhbCBpbnRhY3QsIHNwYXJlIGJhbmRhZ2VzIGluc2lkZSIKMDAwMyxWb2x1bnRlZXIgdmVzdCxSYWNrIEIsMTIsIldhc2hlZApGb2xkZWQgYnkgc2l6ZTsgbW92ZWQgZm9yIHBpY2t1cCIKMDAwNixFeHRlbnNpb24gcmVlbCxCbHVlIGJpbiwyLFR3byByZWVscyBsaXN0ZWQgdG9nZXRoZXIKLFVubGFiZWxsZWQgY3JhdGUsSW50YWtlIGRlc2ssMSxOZWVkcyBhbiBhc3NldCBsYWJlbAowMDA4LExFRCBsYW50ZXJuLENoYXJnaW5nIHNoZWxmLDYKMDAwOSxDbGlwYm9hcmRzLFdlbGNvbWUgZGVzaywxMCxOZXdseSBsaXN0ZWQgZm9yIG5leHQgc2hpZnQK",
+      "rawText": "Inventory ID,Description,Storage,Count,Notes\n0001,Folding table,Community hall,4,Surface checked\n0002,First aid kit,Supply cupboard,3,\"Seal intact, spare bandages inside\"\n0003,Volunteer vest,Rack B,12,\"Washed\nFolded by size; moved for pickup\"\n0006,Extension reel,Blue bin,2,Two reels listed together\n,Unlabelled crate,Intake desk,1,Needs an asset label\n0008,LED lantern,Charging shelf,6\n0009,Clipboards,Welcome desk,10,Newly listed for next shift\n",
+      "headers": [
+        "Inventory ID",
+        "Description",
+        "Storage",
+        "Count",
+        "Notes"
+      ],
+      "rows": [
+        {
+          "record": 2,
+          "cells": [
+            "0001",
+            "Folding table",
+            "Community hall",
+            "4",
+            "Surface checked"
+          ]
+        },
+        {
+          "record": 3,
+          "cells": [
+            "0002",
+            "First aid kit",
+            "Supply cupboard",
+            "3",
+            "Seal intact, spare bandages inside"
+          ]
+        },
+        {
+          "record": 4,
+          "cells": [
+            "0003",
+            "Volunteer vest",
+            "Rack B",
+            "12",
+            "Washed\nFolded by size; moved for pickup"
+          ]
+        },
+        {
+          "record": 5,
+          "cells": [
+            "0006",
+            "Extension reel",
+            "Blue bin",
+            "2",
+            "Two reels listed together"
+          ]
+        },
+        {
+          "record": 6,
+          "cells": [
+            "",
+            "Unlabelled crate",
+            "Intake desk",
+            "1",
+            "Needs an asset label"
+          ]
+        },
+        {
+          "record": 7,
+          "cells": [
+            "0008",
+            "LED lantern",
+            "Charging shelf",
+            "6",
+            null
+          ]
+        },
+        {
+          "record": 8,
+          "cells": [
+            "0009",
+            "Clipboards",
+            "Welcome desk",
+            "10",
+            "Newly listed for next shift"
+          ]
+        }
+      ],
+      "warnings": [
+        "1 data record has missing cells. Missing values are preserved separately from empty strings."
+      ]
+    }
+  },
+  "mapping": {
+    "beforeKey": 0,
+    "afterKey": 0,
+    "fields": [
+      {
+        "label": "Count",
+        "before": 3,
+        "after": 3
+      },
+      {
+        "label": "Notes",
+        "before": 4,
+        "after": 4
+      },
+      {
+        "label": "Item",
+        "before": 1,
+        "after": 1
+      },
+      {
+        "label": "Location",
+        "before": 2,
+        "after": 2
+      }
+    ]
+  },
+  "comparison": {
+    "entries": [
+      {
+        "kind": "unchanged",
+        "key": "0001",
+        "before": [
+          {
+            "record": 2,
+            "cells": [
+              "0001",
+              "Folding table",
+              "Community hall",
+              "4",
+              "Surface checked"
+            ]
+          }
+        ],
+        "after": [
+          {
+            "record": 2,
+            "cells": [
+              "0001",
+              "Folding table",
+              "Community hall",
+              "4",
+              "Surface checked"
+            ]
+          }
+        ],
+        "changes": []
+      },
+      {
+        "kind": "changed",
+        "key": "0002",
+        "before": [
+          {
+            "record": 3,
+            "cells": [
+              "0002",
+              "First aid kit",
+              "Supply cupboard",
+              "2",
+              "Seal intact, spare bandages inside"
+            ]
+          }
+        ],
+        "after": [
+          {
+            "record": 3,
+            "cells": [
+              "0002",
+              "First aid kit",
+              "Supply cupboard",
+              "3",
+              "Seal intact, spare bandages inside"
+            ]
+          }
+        ],
+        "changes": [
+          {
+            "label": "Count",
+            "before": "2",
+            "after": "3"
+          }
+        ]
+      },
+      {
+        "kind": "changed",
+        "key": "0003",
+        "before": [
+          {
+            "record": 4,
+            "cells": [
+              "0003",
+              "Volunteer vest",
+              "Rack A",
+              "12",
+              "Washed\nFolded by size"
+            ]
+          }
+        ],
+        "after": [
+          {
+            "record": 4,
+            "cells": [
+              "0003",
+              "Volunteer vest",
+              "Rack B",
+              "12",
+              "Washed\nFolded by size; moved for pickup"
+            ]
+          }
+        ],
+        "changes": [
+          {
+            "label": "Notes",
+            "before": "Washed\nFolded by size",
+            "after": "Washed\nFolded by size; moved for pickup"
+          },
+          {
+            "label": "Location",
+            "before": "Rack A",
+            "after": "Rack B"
+          }
+        ]
+      },
+      {
+        "kind": "removed",
+        "key": "0004",
+        "before": [
+          {
+            "record": 5,
+            "cells": [
+              "0004",
+              "Water jug",
+              "Kitchen shelf",
+              "3",
+              "Ready for collection"
+            ]
+          }
+        ],
+        "after": [],
+        "changes": []
+      },
+      {
+        "kind": "ambiguous",
+        "key": "0006",
+        "before": [
+          {
+            "record": 6,
+            "cells": [
+              "0006",
+              "Extension reel",
+              "Blue bin",
+              "1",
+              "Short cable"
+            ]
+          },
+          {
+            "record": 7,
+            "cells": [
+              "0006",
+              "Extension reel",
+              "Green bin",
+              "1",
+              "Long cable"
+            ]
+          }
+        ],
+        "after": [
+          {
+            "record": 5,
+            "cells": [
+              "0006",
+              "Extension reel",
+              "Blue bin",
+              "2",
+              "Two reels listed together"
+            ]
+          }
+        ],
+        "changes": []
+      },
+      {
+        "kind": "unchanged",
+        "key": "0008",
+        "before": [
+          {
+            "record": 9,
+            "cells": [
+              "0008",
+              "LED lantern",
+              "Charging shelf",
+              "6",
+              null
+            ]
+          }
+        ],
+        "after": [
+          {
+            "record": 7,
+            "cells": [
+              "0008",
+              "LED lantern",
+              "Charging shelf",
+              "6",
+              null
+            ]
+          }
+        ],
+        "changes": []
+      },
+      {
+        "kind": "added",
+        "key": "0009",
+        "before": [],
+        "after": [
+          {
+            "record": 8,
+            "cells": [
+              "0009",
+              "Clipboards",
+              "Welcome desk",
+              "10",
+              "Newly listed for next shift"
+            ]
+          }
+        ],
+        "changes": []
+      },
+      {
+        "kind": "invalid-key",
+        "key": "",
+        "before": [
+          {
+            "record": 8,
+            "cells": [
+              "",
+              "Unlabelled crate",
+              "Intake desk",
+              "1",
+              "Needs an asset label"
+            ]
+          }
+        ],
+        "after": [],
+        "changes": []
+      },
+      {
+        "kind": "invalid-key",
+        "key": "",
+        "before": [],
+        "after": [
+          {
+            "record": 6,
+            "cells": [
+              "",
+              "Unlabelled crate",
+              "Intake desk",
+              "1",
+              "Needs an asset label"
+            ]
+          }
+        ],
+        "changes": []
+      }
+    ],
+    "summary": {
+      "added": 1,
+      "removed": 1,
+      "changed": 2,
+      "unchanged": 2,
+      "ambiguous": 1,
+      "invalidKey": 2
+    },
+    "warnings": [
+      "Before: 1 data record has missing cells. Missing values are preserved separately from empty strings.",
+      "After: 1 data record has missing cells. Missing values are preserved separately from empty strings.",
+      "1 duplicate ID group is ambiguous. All rows sharing those IDs are excluded from added, removed, changed and unchanged counts.",
+      "2 records have an empty or missing ID and cannot be matched."
+    ],
+    "complete": false
+  }
+}

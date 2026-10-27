@@ -1,0 +1,13 @@
+"kind","id","id_state","before_records","after_records","field","before_value","before_state","after_value","after_state"
+"unchanged","0001","text","2","2","","","not-a-field-change","","not-a-field-change"
+"changed","0002","text","3","3","Count","2","text","3","text"
+"changed","0003","text","4","4","Notes","Washed
+Folded by size","text","Washed
+Folded by size; moved for pickup","text"
+"changed","0003","text","4","4","Location","Rack A","text","Rack B","text"
+"removed","0004","text","5","","","","not-a-field-change","","not-a-field-change"
+"ambiguous","0006","text","6;7","5","","","not-a-field-change","","not-a-field-change"
+"unchanged","0008","text","9","7","","","not-a-field-change","","not-a-field-change"
+"added","0009","text","","8","","","not-a-field-change","","not-a-field-change"
+"invalid-key","","empty","8","","","","not-a-field-change","","not-a-field-change"
+"invalid-key","","empty","","6","","","not-a-field-change","","not-a-field-change"

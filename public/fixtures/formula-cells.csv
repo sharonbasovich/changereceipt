@@ -1,0 +1,6 @@
+Asset ID,Item,Location,Count,Notes
+0001,=1+1,Supply cupboard,1,Synthetic formula-like text
+0002,+SUM(1:2),Supply cupboard,1,Synthetic formula-like text
+0003,-2+3,Supply cupboard,1,Synthetic formula-like text
+0004,@SUM(1:2),Supply cupboard,1,Synthetic formula-like text
+0005,"<script>alert('synthetic')</script>",Supply cupboard,1,Render as plain text

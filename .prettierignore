@@ -1,0 +1,9 @@
+node_modules/
+.npm-cache/
+dist/
+playwright-report/
+test-results/
+docs/evidence/
+package-lock.json
+deliverables/
+release-work/
