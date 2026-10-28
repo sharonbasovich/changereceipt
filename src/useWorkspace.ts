@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import { importSnapshot, LIMITS } from './core'
 import type { Snapshot } from './core'
+import { loadDemoFiles } from './demo'
 
 export type Side = 'before' | 'after'
 type Slot = { snapshot?: Snapshot; busy: boolean; error?: string }
@@ -73,15 +74,7 @@ export function useWorkspace(onInvalidate: () => void) {
     reset(false)
     setNotice('Loading two synthetic snapshots…')
     try {
-      const files = await Promise.all(
-        ['before', 'after'].map(async (side) => {
-          const name = `handoff-${side}.csv`
-          const response = await fetch(`/fixtures/${name}`, { signal: abort.signal })
-          if (!response.ok)
-            throw new Error('Synthetic files could not be loaded. Choose CSV files instead.')
-          return new File([await response.arrayBuffer()], name, { type: 'text/csv' })
-        }),
-      )
+      const files = await loadDemoFiles(abort.signal)
       if (!abort.signal.aborted)
         await Promise.all([
           read('before', files[0], abort.signal),

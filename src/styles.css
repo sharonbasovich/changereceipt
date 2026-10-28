@@ -582,7 +582,7 @@ main {
 .key-section p {
   font-size: 12px;
   line-height: 1.7;
-  color: var(--muted);
+  color: #52665e;
   margin-top: 8px;
   max-width: 310px;
 }
@@ -1107,11 +1107,9 @@ select {
 }
 @keyframes arrive {
   from {
-    opacity: 0.5;
     transform: translateY(4px);
   }
   to {
-    opacity: 1;
     transform: translateY(0);
   }
 }

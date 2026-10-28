@@ -1,3 +1,4 @@
+import { useLayoutEffect, useRef } from 'react'
 import { ArrowRight, Plus, Trash2, Link2 } from 'lucide-react'
 import type { Snapshot, FieldMapping, Mapping } from '../core'
 
@@ -44,6 +45,22 @@ function ColumnSelect({
   )
 }
 export function MappingStep({ before, after, mapping, setMapping, onCompare, error }: Props) {
+  const addField = useRef<HTMLButtonElement>(null)
+  const removeFields = useRef<(HTMLButtonElement | null)[]>([])
+  const pendingFocus = useRef<{ index: number; origin: HTMLButtonElement } | null>(null)
+  useLayoutEffect(() => {
+    const pending = pendingFocus.current
+    pendingFocus.current = null
+    // Only restore focus for the removal the user activated, never unrelated updates.
+    if (
+      !pending ||
+      (document.activeElement !== document.body && document.activeElement !== pending.origin)
+    )
+      return
+    const index = Math.min(pending.index, mapping.fields.length - 1)
+    const target = index >= 0 ? removeFields.current[index] : addField.current
+    target?.focus()
+  })
   function updateField(index: number, update: Partial<FieldMapping>) {
     setMapping({
       ...mapping,
@@ -164,9 +181,14 @@ export function MappingStep({ before, after, mapping, setMapping, onCompare, err
               <button
                 className="icon-button"
                 aria-label={`Remove field ${i + 1}`}
-                onClick={() =>
+                ref={(node) => {
+                  removeFields.current[i] = node
+                }}
+                onClick={(event) => {
+                  if (document.activeElement === event.currentTarget)
+                    pendingFocus.current = { index: i, origin: event.currentTarget }
                   setMapping({ ...mapping, fields: mapping.fields.filter((_, j) => j !== i) })
-                }
+                }}
               >
                 <Trash2 size={18} />
               </button>
@@ -176,6 +198,7 @@ export function MappingStep({ before, after, mapping, setMapping, onCompare, err
       )}
       <button
         className="button text-button"
+        ref={addField}
         disabled={mapping.fields.length >= 64}
         onClick={() =>
           setMapping({

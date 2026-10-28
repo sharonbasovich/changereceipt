@@ -51,6 +51,21 @@ Untrusted cell text is rendered as text through React. Convenience CSV output qu
 
 The browser keeps imported data only in memory. There is no analytics, remote processing, application database, or persistent session storage. This prototype does not include encryption, authentication, collaboration, or a saved-receipt viewer. Handle downloaded files according to your own data practices.
 
+## Check a saved receipt locally
+
+The optional [self-consistency verifier](receipt-verifier/README.md) re-imports the
+original CSV bytes in a saved receipt, checks their hashes, and recomputes the
+comparison with the same core. It does not upload the file or overwrite it:
+
+```sh
+node --experimental-strip-types receipt-verifier/cli.mjs ./receipt.json
+```
+
+A pass means the evidence and comparison agree internally, **not** that the file
+has a trusted author or represents real inventory. A person who rewrites all the
+evidence consistently can produce a passing file. The CLI applies documented size
+and compatibility limits and can reject unusually large otherwise valid exports.
+
 ## Fixtures and checks
 
 All bundled examples are synthetic. The main handoff includes renamed columns, leading-zero IDs, quoted comma/newline cells, changed values, a new record, a removed record, a duplicate group, empty IDs, and a short record. See [fixture expectations](public/fixtures/README.md) for exact counts and smaller rejection/security cases.

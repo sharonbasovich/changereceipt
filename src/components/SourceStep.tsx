@@ -1,3 +1,4 @@
+import { useLayoutEffect, useRef } from 'react'
 import { FileUp, FileCheck2, X, ArrowRight, FlaskConical } from 'lucide-react'
 import type { Snapshot } from '../core'
 import type { Side } from '../useWorkspace'
@@ -13,6 +14,23 @@ type Props = {
 }
 
 export function SourceStep({ slots, onRead, onCancel, onRemove, onDemo, onContinue }: Props) {
+  const choosers = useRef<Partial<Record<Side, HTMLInputElement | null>>>({})
+  const pendingFocus = useRef<{ side: Side; origin: HTMLButtonElement } | null>(null)
+  useLayoutEffect(() => {
+    const pending = pendingFocus.current
+    pendingFocus.current = null
+    // Import completion/failure must not move focus away from the user's next task.
+    if (
+      !pending ||
+      (document.activeElement !== document.body && document.activeElement !== pending.origin)
+    )
+      return
+    choosers.current[pending.side]?.focus()
+  })
+  function restoreAfterAction(side: Side, origin: HTMLButtonElement, action: (side: Side) => void) {
+    if (document.activeElement === origin) pendingFocus.current = { side, origin }
+    action(side)
+  }
   return (
     <section aria-labelledby="source-title" className="step-content">
       <div className="section-heading">
@@ -55,7 +73,7 @@ export function SourceStep({ slots, onRead, onCancel, onRemove, onDemo, onContin
                     <button
                       className="icon-button"
                       aria-label={`Remove ${side} snapshot`}
-                      onClick={() => onRemove(side)}
+                      onClick={(event) => restoreAfterAction(side, event.currentTarget, onRemove)}
                     >
                       <X size={18} />
                     </button>
@@ -71,7 +89,10 @@ export function SourceStep({ slots, onRead, onCancel, onRemove, onDemo, onContin
                 <div className="upload-center" role="status">
                   <div className="loading-line" />
                   <strong>Reading {side} snapshot…</strong>
-                  <button className="button secondary" onClick={() => onCancel(side)}>
+                  <button
+                    className="button secondary"
+                    onClick={(event) => restoreAfterAction(side, event.currentTarget, onCancel)}
+                  >
                     Cancel {side} import
                   </button>
                 </div>
@@ -83,6 +104,9 @@ export function SourceStep({ slots, onRead, onCancel, onRemove, onDemo, onContin
                   <label className="button secondary file-button">
                     Choose {side} CSV
                     <input
+                      ref={(node) => {
+                        choosers.current[side] = node
+                      }}
                       aria-label={`Choose ${side} CSV`}
                       type="file"
                       accept=".csv,text/csv"
