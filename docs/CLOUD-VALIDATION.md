@@ -38,7 +38,10 @@ Local browser execution was unavailable because Chromium could not create its
 required socket. The first PR CI run executed all 18 existing Chromium checks:
 17 passed and one reported insufficient contrast in the mapping ID explanation
 (4.38:1 against a 4.5:1 threshold). This branch darkens only that explanation text;
-the existing axe assertion is retained unchanged. See PR checks for the rerun result.
+the existing axe assertion is retained unchanged. A subsequent run revealed that
+the step entrance opacity fade blended multiple text colors below the contrast
+threshold mid-animation. The fade is removed, while the short translation remains,
+so contrast is maintained throughout the transition. See PR checks for the rerun result.
 Screen-reader and manual visual checks are not claimed.
 
 CI uses a standard public Ubuntu 24.04 runner, read-only contents permission,
