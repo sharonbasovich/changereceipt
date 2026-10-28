@@ -190,6 +190,9 @@ export async function importSnapshot(name: string, bytes: Uint8Array): Promise<S
   const parseText = checkCsvStructure(text)
   const parsed = Papa.parse<string[]>(parseText, {
     delimiter: ',',
+    // We removed the encoding BOM above. Papa strips another leading BOM from
+    // string input; restore this chunk so a literal header codepoint stays data.
+    beforeFirstChunk: () => parseText,
     newline: '\n',
     quoteChar: '"',
     escapeChar: '"',
