@@ -34,10 +34,15 @@ Runtime dependencies are unchanged.
 
 ## Limits and compatibility
 
-Browser execution was unavailable in this environment because Chromium could not
-create its required socket. No browser assertions, rendered screenshots, mobile,
-screen-reader or visual checks are claimed for this candidate. Existing earlier
-browser evidence is not a substitute for candidate validation.
+Local browser execution was unavailable because Chromium could not create its
+required socket. The first PR CI run executed all 18 existing Chromium checks:
+17 passed and one reported insufficient contrast in the mapping ID explanation
+(4.38:1 against a 4.5:1 threshold). This branch darkens only that explanation text;
+the existing axe assertion is retained unchanged. See PR checks for the rerun result.
+Screen-reader and manual visual checks are not claimed.
+
+CI uses a standard public Ubuntu 24.04 runner, read-only contents permission,
+Node 24, and the official Playwright Chromium installation. It does not deploy.
 
 Old receipts affected by the double-BOM parser defect can fail re-import consistency
 under the corrected parser. The original bytes were retained; the rejection identifies
