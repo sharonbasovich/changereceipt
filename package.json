@@ -9,11 +9,13 @@
     "preview": "vite preview --host 127.0.0.1",
     "lint": "eslint .",
     "typecheck": "tsc -b",
-    "test": "vitest run && node --experimental-strip-types --test receipt-verifier/verify.test.mjs",
+    "test": "vitest run && node --experimental-strip-types --test receipt-verifier/verify.test.mjs && npm run test:server",
     "test:receipt": "node --experimental-strip-types --test receipt-verifier/verify.test.mjs",
     "test:browser": "playwright test",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "start": "node server.mjs",
+    "test:server": "node --test tests/server.test.mjs"
   },
   "dependencies": {
     "lucide-react": "1.61.0",
