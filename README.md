@@ -6,7 +6,25 @@ The useful boundary is deliberate: ChangeReceipt reports differences between sup
 
 ## Run locally
 
-Requires Node.js 22.14 or newer and npm. From this folder:
+Requires **Node.js 22.14 or newer**. For a compiled release ZIP, extract the
+entire folder and run `node server.mjs`, then open **http://127.0.0.1:4173/**.
+Windows users can also double-click `Start-ChangeReceipt.cmd`. No npm install,
+account, or external network connection is needed to run the compiled app.
+Stop the server with Ctrl+C. If port 4173 is occupied, set `CHANGERECEIPT_PORT`
+to another integer from 1024 through 65535. The server binds only to 127.0.0.1;
+it serves the packaged `dist/` rather than live source files. Do not open the
+HTML directly as a file: the synthetic examples need HTTP serving.
+
+For a **source checkout** (including GitHub's automatic Source code archives),
+npm installation and a build are required:
+
+```sh
+npm ci
+npm run build
+npm start
+```
+
+For development with live source updates:
 
 ```sh
 npm ci
@@ -76,9 +94,10 @@ npm run typecheck
 npm run test
 npm run build
 npm run test:browser
+npm run test:server
 ```
 
-The configured unit suite targets parsing, bounds, deterministic comparison, ambiguous identifiers, value preservation, and export behavior. The browser suite targets the usable workflow and accessible interaction. Browser testing requires Playwright's browser runtime; use `npx playwright install chromium` if it is not installed. To use an installed Chrome instead, set `PLAYWRIGHT_CHANNEL=chrome` in your shell. A script being present is not itself evidence that it passed; the final local verification report records the checks actually run and any unavailable checks.
+The configured unit suite targets parsing, bounds, deterministic comparison, ambiguous identifiers, value preservation, and export behavior. The browser suite targets the usable workflow and accessible interaction. Set `CHANGERECEIPT_SERVER_MODE=production` after building to run the same browser suite through the dependency-free release launcher instead of Vite. CI checks both modes. Browser testing requires Playwright's browser runtime; use `npx playwright install chromium` if it is not installed. To use an installed Chrome instead, set `PLAYWRIGHT_CHANNEL=chrome` in your shell. A script being present is not itself evidence that it passed; the final local verification report records the checks actually run and any unavailable checks.
 
 ## Project status
 

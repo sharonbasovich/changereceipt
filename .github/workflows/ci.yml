@@ -25,3 +25,7 @@ jobs:
       - run: npm run build
       - run: npx playwright install --with-deps chromium
       - run: npm run test:browser
+      - name: Verify compiled app through dependency-free launcher
+        run: npm run test:browser
+        env:
+          CHANGERECEIPT_SERVER_MODE: production
