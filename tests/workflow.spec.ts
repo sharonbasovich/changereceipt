@@ -254,6 +254,70 @@ test('replacing an imported source clears keys and cannot expose a stale compari
   ).toHaveCount(0)
 })
 
+test('rejected replacements preserve both original sources and require a fresh mapping', async ({
+  page,
+}) => {
+  await enterMapping(page)
+  await compare(page)
+  const original = await receipt(page)
+  await page.getByRole('button', { name: /Your snapshots/i }).click()
+  for (const side of ['before', 'after'] as const) {
+    await upload(page, side, 'ID,Name\n"unclosed', true, 'invalid.csv')
+    await expect(page.getByRole('alert').last()).toContainText('Previous snapshot kept')
+    await expect(page.getByText(`${side}.csv`, { exact: true })).toBeVisible()
+    await expect(page.getByLabel(`Replace ${side} CSV`, { exact: true })).toBeAttached()
+  }
+  await expect(page.getByRole('button', { name: /Review & receipt/i })).toBeDisabled()
+  await page.getByRole('button', { name: 'Map columns', exact: true }).click()
+  await expect(page.getByLabel('Before ID column')).toHaveValue('')
+  await expect(page.getByLabel('After ID column')).toHaveValue('')
+  await compare(page)
+  expect(await receipt(page)).toEqual(original)
+})
+
+test('canceling a replacement preserves exact evidence, returns focus, and ignores late reads', async ({
+  page,
+}) => {
+  await enterMapping(page)
+  await compare(page)
+  const original = await receipt(page)
+  await page.getByRole('button', { name: /Your snapshots/i }).click()
+  await page.evaluate(() => {
+    const arrayBuffer = File.prototype.arrayBuffer
+    File.prototype.arrayBuffer = async function () {
+      const bytes = await arrayBuffer.call(this)
+      if (this.name === 'pending.csv')
+        await new Promise<void>((resolve) => {
+          window.addEventListener('release-pending-read', () => resolve(), { once: true })
+          window.dispatchEvent(new Event('pending-read-started'))
+        })
+      return bytes
+    }
+  })
+  for (const side of ['before', 'after'] as const) {
+    // Handshake before cancellation avoids relying on a timing delay.
+    const started = page.evaluate(
+      () =>
+        new Promise<void>((resolve) => {
+          window.addEventListener('pending-read-started', () => resolve(), { once: true })
+        }),
+    )
+    await upload(page, side, 'ID,Name\nLATE,Not the original\n', true, 'pending.csv')
+    await started
+    await expect(page.getByRole('button', { name: 'Map columns', exact: true })).toBeDisabled()
+    await expect(page.getByRole('button', { name: /Map the columns/i })).toBeDisabled()
+    await expect(page.getByRole('button', { name: /Review & receipt/i })).toBeDisabled()
+    await page.getByRole('button', { name: `Cancel ${side} import`, exact: true }).click()
+    await expect(page.getByLabel(`Replace ${side} CSV`, { exact: true })).toBeFocused()
+    await expect(page.getByText(/import canceled.*Previous snapshot kept/)).toBeVisible()
+    await page.evaluate(() => window.dispatchEvent(new Event('release-pending-read')))
+    await expect(page.getByText(`${side}.csv`, { exact: true })).toBeVisible()
+  }
+  await page.getByRole('button', { name: 'Map columns', exact: true }).click()
+  await compare(page)
+  expect(await receipt(page)).toEqual(original)
+})
+
 test('cancel import and reset invalidate delayed reads and permit a clean new workflow', async ({
   page,
 }) => {

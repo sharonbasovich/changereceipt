@@ -48,7 +48,7 @@ The app uses React, TypeScript, Vite, and Papa Parse. It needs no account, crede
 4. Review added, removed, changed, unchanged, ambiguous, and invalid-key entries. Open the source evidence for the relevant records.
 5. Download the full JSON receipt. Use the CSV export as a convenient view of results, with the JSON receipt as the authoritative evidence package.
 
-Changing a source or mapping requires a new comparison. Reset clears the in-memory session. Reloading or closing the page also loses the session; download a receipt before leaving if you need to retain it.
+Changing a source or mapping requires a new comparison. If a replacement import fails or is canceled, the last successfully imported snapshot is kept; select the ID columns and mappings again before comparing. A successful replacement supersedes the old snapshot. Reset clears the in-memory session. Reloading or closing the page also loses the session; download a receipt before leaving if you need to retain it.
 
 ## Evidence and ambiguity rules
 

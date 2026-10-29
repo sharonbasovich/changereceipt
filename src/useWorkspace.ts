@@ -20,17 +20,17 @@ export function useWorkspace(onInvalidate: () => void) {
     tokens.current.before++
     tokens.current.after++
     setSlots((s) => ({
-      before: s.before.busy ? { busy: false } : s.before,
-      after: s.after.busy ? { busy: false } : s.after,
+      before: s.before.busy ? { snapshot: s.before.snapshot, busy: false } : s.before,
+      after: s.after.busy ? { snapshot: s.after.snapshot, busy: false } : s.after,
     }))
   }
 
   function cancel(side: Side) {
     stopDemo()
     tokens.current[side]++
-    setSlots((s) => ({ ...s, [side]: { busy: false } }))
+    setSlots((s) => ({ ...s, [side]: { snapshot: s[side].snapshot, busy: false } }))
     setNotice(
-      `${side === 'before' ? 'Before' : 'After'} import canceled. Choose a file to try again.`,
+      `${side === 'before' ? 'Before' : 'After'} import canceled. ${slots[side].snapshot ? 'Previous snapshot kept. Map columns again to compare.' : 'Choose a file to try again.'}`,
     )
     onInvalidate()
   }
@@ -40,7 +40,8 @@ export function useWorkspace(onInvalidate: () => void) {
     const token = ++tokens.current[side]
     onInvalidate()
     setNotice('')
-    setSlots((s) => ({ ...s, [side]: { busy: true } }))
+    // Keep the last successful evidence until its replacement has passed every check.
+    setSlots((s) => ({ ...s, [side]: { snapshot: s[side].snapshot, busy: true } }))
     try {
       if (file.size > LIMITS.maxBytes)
         throw new Error('File exceeds the 2 MiB limit. Choose a smaller CSV.')
@@ -57,6 +58,7 @@ export function useWorkspace(onInvalidate: () => void) {
       setSlots((s) => ({
         ...s,
         [side]: {
+          snapshot: s[side].snapshot,
           busy: false,
           error:
             error instanceof Error

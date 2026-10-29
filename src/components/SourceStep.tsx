@@ -48,7 +48,18 @@ export function SourceStep({ slots, onRead, onCancel, onRemove, onDemo, onContin
                 <span className="step-number">{i + 1}</span>
                 <h3>{side === 'before' ? 'Before the handoff' : 'After the handoff'}</h3>
               </div>
-              {slot.snapshot ? (
+              {slot.busy ? (
+                <div className="upload-center" role="status">
+                  <div className="loading-line" />
+                  <strong>Reading {side} snapshot…</strong>
+                  <button
+                    className="button secondary"
+                    onClick={(event) => restoreAfterAction(side, event.currentTarget, onCancel)}
+                  >
+                    Cancel {side} import
+                  </button>
+                </div>
+              ) : slot.snapshot ? (
                 <>
                   <FileCheck2 className="source-icon" aria-hidden="true" />
                   <strong className="filename">{slot.snapshot.name}</strong>
@@ -60,6 +71,9 @@ export function SourceStep({ slots, onRead, onCancel, onRemove, onDemo, onContin
                     <label className="button secondary file-button">
                       Replace {side}
                       <input
+                        ref={(node) => {
+                          choosers.current[side] = node
+                        }}
                         aria-label={`Replace ${side} CSV`}
                         type="file"
                         accept=".csv,text/csv"
@@ -85,17 +99,6 @@ export function SourceStep({ slots, onRead, onCancel, onRemove, onDemo, onContin
                     </p>
                   )}
                 </>
-              ) : slot.busy ? (
-                <div className="upload-center" role="status">
-                  <div className="loading-line" />
-                  <strong>Reading {side} snapshot…</strong>
-                  <button
-                    className="button secondary"
-                    onClick={(event) => restoreAfterAction(side, event.currentTarget, onCancel)}
-                  >
-                    Cancel {side} import
-                  </button>
-                </div>
               ) : (
                 <>
                   <FileUp className="source-icon" aria-hidden="true" />
@@ -122,6 +125,7 @@ export function SourceStep({ slots, onRead, onCancel, onRemove, onDemo, onContin
               {slot.error && (
                 <p className="error" role="alert">
                   {slot.error}
+                  {slot.snapshot && ' Previous snapshot kept. Map columns again to compare.'}
                 </p>
               )}
             </div>
