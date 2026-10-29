@@ -31,7 +31,9 @@ export default function App() {
   })
   const before = workspace.slots.before.snapshot
   const after = workspace.slots.after.snapshot
-  const both = Boolean(before && after)
+  const both = Boolean(
+    before && after && !workspace.slots.before.busy && !workspace.slots.after.busy,
+  )
 
   useEffect(() => {
     if (previousStep.current !== step) {
