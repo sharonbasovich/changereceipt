@@ -1,5 +1,5 @@
 import { Buffer } from 'node:buffer'
-import { URL } from 'node:url'
+import { URL, fileURLToPath } from 'node:url'
 import process from 'node:process'
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
@@ -365,7 +365,11 @@ test('CLI statuses, quiet safe errors, read-only and size gate', async () => {
     const cli = (...args) =>
       spawnSync(
         process.execPath,
-        ['--experimental-strip-types', new URL('./cli.mjs', import.meta.url).pathname, ...args],
+        [
+          '--experimental-strip-types',
+          fileURLToPath(new URL('./cli.mjs', import.meta.url)),
+          ...args,
+        ],
         { encoding: 'utf8' },
       )
     assert.equal(cli('--help').status, 0)

@@ -1709,3 +1709,37 @@ select {
   flex: 1;
   min-width: 130px;
 }
+.hosted-notice {
+  border-left: 3px solid var(--green);
+  background: #f3f7f2;
+  padding: 16px 20px;
+  margin-bottom: 18px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.hosted-notice strong {
+  display: block;
+  color: var(--green);
+  font-size: 15px;
+  margin-bottom: 4px;
+}
+.hosted-notice p {
+  max-width: 76ch;
+}
+.hosted-notice a {
+  display: inline-block;
+  margin-top: 8px;
+  text-underline-offset: 3px;
+}
+.hosted-demo .demo-strip {
+  margin-top: 0;
+  margin-bottom: 24px;
+}
+@media (max-width: 650px) {
+  .hosted-demo .page-intro {
+    margin-bottom: 19px;
+  }
+  .hosted-notice {
+    padding: 14px 16px;
+  }
+}

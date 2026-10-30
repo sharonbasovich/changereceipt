@@ -70,7 +70,17 @@ test('production launcher serves only compiled local files and stays healthy aft
   await writeFile(join(folder, 'dist', 'assets', 'app.css'), 'body{}')
   await writeFile(join(folder, 'dist', 'fixtures', 'demo.csv'), 'id,label\n1,Synthetic\n')
   await writeFile(join(folder, 'secret.txt'), 'must not serve')
-  await symlink(join(folder, 'secret.txt'), join(folder, 'dist', 'escape.txt'))
+  let escapePath = '/escape.txt'
+  if (process.platform === 'win32') {
+    // Directory junctions exercise the same realpath escape guard without requiring
+    // Windows Developer Mode or administrator-only file symlink privileges.
+    await mkdir(join(folder, 'outside'))
+    await writeFile(join(folder, 'outside', 'secret.txt'), 'must not serve')
+    await symlink(join(folder, 'outside'), join(folder, 'dist', 'escape'), 'junction')
+    escapePath = '/escape/secret.txt'
+  } else {
+    await symlink(join(folder, 'secret.txt'), join(folder, 'dist', 'escape.txt'))
+  }
   const port = await unusedPort()
   const run = await start(folder, port)
   t.after(async () => {
@@ -101,7 +111,7 @@ test('production launcher serves only compiled local files and stays healthy aft
   assert.equal((await get(port, '/', 'GET', `localhost:${port}`)).status, 200)
   assert.equal((await get(port, '/', 'GET', 'example.invalid')).status, 403)
   assert.equal((await get(port, '/', 'POST')).status, 405)
-  for (const path of ['/missing.js', '/assets/', '/escape.txt', '/server.mjs'])
+  for (const path of ['/missing.js', '/assets/', escapePath, '/server.mjs'])
     assert.equal((await get(port, path)).status, 404, path)
   for (const path of [
     '/../secret.txt',

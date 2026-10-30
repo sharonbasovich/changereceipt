@@ -29,3 +29,7 @@ jobs:
         run: npm run test:browser
         env:
           CHANGERECEIPT_SERVER_MODE: production
+      - name: Build separate static subpath artifact
+        run: npm run build:hosted
+      - name: Verify production subpath and hosted privacy behavior
+        run: npm run test:hosted

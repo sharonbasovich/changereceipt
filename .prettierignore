@@ -7,3 +7,5 @@ docs/evidence/
 package-lock.json
 deliverables/
 release-work/
+dist-hosted/
+hosted-artifacts/

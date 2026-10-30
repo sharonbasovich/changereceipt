@@ -98,11 +98,14 @@ async function capture(page: Page, path: string) {
     window.scrollTo({ top: 0, behavior: 'instant' })
   })
   await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0)
-  await page.screenshot({ path, fullPage: true, animations: 'disabled' })
+  const output = new URL(page.url()).pathname.startsWith('/changereceipt/')
+    ? `hosted-artifacts/workflow-evidence/${path}`
+    : path
+  await page.screenshot({ path: output, fullPage: true, animations: 'disabled' })
 }
 
 test.beforeEach(async ({ page }) => {
-  await page.goto('/')
+  await page.goto('./')
 })
 
 test('requires explicit IDs, then accounts for changes, duplicate groups, and incomplete source records', async ({

@@ -6,6 +6,9 @@
   "scripts": {
     "dev": "vite --host 127.0.0.1",
     "build": "tsc -b && vite build",
+    "build:hosted": "tsc -b && node scripts/build-hosted.mjs",
+    "preview:hosted": "node scripts/serve-hosted.mjs",
+    "test:hosted": "playwright test --config playwright.hosted.config.ts",
     "preview": "vite preview --host 127.0.0.1",
     "lint": "eslint .",
     "typecheck": "tsc -b",

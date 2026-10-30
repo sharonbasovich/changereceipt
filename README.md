@@ -4,6 +4,8 @@ A local-first prototype for reviewing a volunteer inventory handoff. Compare two
 
 The useful boundary is deliberate: ChangeReceipt reports differences between supplied text records. It does not confirm a physical handoff, verify quantities, detect fraud, or automatically reconcile real inventory.
 
+A separate [static synthetic demo build](docs/HOSTED-DEMO.md) is prepared for `/changereceipt/`. It does not replace the local release. Hosted visitors receive the app and synthetic fixtures from the hosting provider, which receives ordinary page/asset request metadata; CSV processing still happens in browser memory. Deployment and any existing event entry remain separate decisions.
+
 ## Run locally
 
 Requires **Node.js 22.14 or newer**. For a compiled release ZIP, extract the

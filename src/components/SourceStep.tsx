@@ -2,6 +2,7 @@ import { useLayoutEffect, useRef } from 'react'
 import { FileUp, FileCheck2, X, ArrowRight, FlaskConical } from 'lucide-react'
 import type { Snapshot } from '../core'
 import type { Side } from '../useWorkspace'
+import { HOSTED_DEMO } from '../deployment'
 
 type Slot = { snapshot?: Snapshot; busy: boolean; error?: string }
 type Props = {
@@ -31,6 +32,18 @@ export function SourceStep({ slots, onRead, onCancel, onRemove, onDemo, onContin
     if (document.activeElement === origin) pendingFocus.current = { side, origin }
     action(side)
   }
+  const demoStrip = (
+    <div className="demo-strip">
+      <FlaskConical aria-hidden="true" size={23} />
+      <div>
+        <strong>Take a practice handoff.</strong>
+        <p>Try synthetic supplies with changed records, a duplicate ID, and a missing value.</p>
+      </div>
+      <button className={`button ${HOSTED_DEMO ? 'primary' : 'secondary'}`} onClick={onDemo}>
+        Load synthetic example
+      </button>
+    </div>
+  )
   return (
     <section aria-labelledby="source-title" className="step-content">
       <div className="section-heading">
@@ -39,6 +52,21 @@ export function SourceStep({ slots, onRead, onCancel, onRemove, onDemo, onContin
           <p>The inventory before the handoff, and the inventory after it.</p>
         </div>
       </div>
+      {HOSTED_DEMO && (
+        <>
+          <div className="hosted-notice" role="note" aria-label="Hosted demo privacy">
+            <strong>Hosted synthetic demo</strong>
+            <p>
+              CSV contents stay in this tab. The hosting provider receives ordinary page and asset
+              request metadata, such as your IP address and browser details.
+            </p>
+            <a href="https://github.com/sharonbasovich/changereceipt/releases/tag/v0.1.2">
+              Prefer to run it locally? Get the local release.
+            </a>
+          </div>
+          {demoStrip}
+        </>
+      )}
       <div className="source-grid">
         {(['before', 'after'] as const).map((side, i) => {
           const slot = slots[side]
@@ -136,18 +164,13 @@ export function SourceStep({ slots, onRead, onCancel, onRemove, onDemo, onContin
         Up to 2 MiB, 10,000 records, 64 columns, and 20,000 characters per cell in each file.
         Commas, quoted text, and quoted line breaks are supported.
       </p>
-      <div className="demo-strip">
-        <FlaskConical aria-hidden="true" size={23} />
-        <div>
-          <strong>Take a practice handoff.</strong>
-          <p>Try synthetic supplies with changed records, a duplicate ID, and a missing value.</p>
-        </div>
-        <button className="button secondary" onClick={onDemo}>
-          Load synthetic example
-        </button>
-      </div>
+      {!HOSTED_DEMO && demoStrip}
       <div className="step-footer">
-        <p>Nothing is uploaded. Sources stay in this tab until reset or reload.</p>
+        <p>
+          {HOSTED_DEMO
+            ? 'Imported CSV contents stay in this tab until reset or reload.'
+            : 'Nothing is uploaded. Sources stay in this tab until reset or reload.'}
+        </p>
         <button
           className="button primary"
           disabled={

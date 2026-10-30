@@ -7,6 +7,7 @@ import { SourceStep } from './components/SourceStep'
 import { MappingStep } from './components/MappingStep'
 import type { DraftMapping } from './components/MappingStep'
 import { ReviewStep } from './components/ReviewStep'
+import { HOSTED_DEMO } from './deployment'
 
 type Step = 'sources' | 'mapping' | 'review'
 const initialMapping = (): DraftMapping => ({ beforeKey: null, afterKey: null, fields: [] })
@@ -57,7 +58,7 @@ export default function App() {
   }
 
   return (
-    <div className="app-shell">
+    <div className={`app-shell${HOSTED_DEMO ? ' hosted-demo' : ''}`}>
       <a className="skip-link" href="#main">
         Skip to workspace
       </a>
@@ -98,8 +99,12 @@ export default function App() {
         </nav>
         <div className="local-note">
           <ShieldCheck size={23} aria-hidden="true" />
-          <strong>Local by design.</strong>
-          <p>Your files are processed in this browser. No accounts, uploads, or cloud copies.</p>
+          <strong>{HOSTED_DEMO ? 'Comparison stays in this tab.' : 'Local by design.'}</strong>
+          <p>
+            {HOSTED_DEMO
+              ? 'CSV contents are processed in your browser and are not sent to the host. No account is needed.'
+              : 'Your files are processed in this browser. No accounts, uploads, or cloud copies.'}
+          </p>
           <span>Reset or reload clears the workspace.</span>
         </div>
         <p className="sidebar-foot">
@@ -174,7 +179,7 @@ export default function App() {
             {step === 'sources' ? workspace.notice : ''}
           </p>
           <footer className="main-footer">
-            <span>ChangeReceipt · Local prototype</span>
+            <span>ChangeReceipt · {HOSTED_DEMO ? 'Hosted synthetic demo' : 'Local prototype'}</span>
             <span>Describes source records. Does not verify physical stock.</span>
           </footer>
         </main>
