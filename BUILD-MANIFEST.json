@@ -1,0 +1,24 @@
+{
+  "format": "ChangeReceipt static demo",
+  "sourceCommit": "6718d5076f0176c900feef5be34b9b44431783df",
+  "sourceDirty": false,
+  "basePath": "/changereceipt/",
+  "localDistPreserved": true,
+  "inputData": "CSV contents are processed in browser memory; no upload endpoint or persistent session.",
+  "hostingMetadata": "The hosting provider receives ordinary page and asset request metadata.",
+  "files": {
+    ".nojekyll": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "assets/index-BHMQb_Aa.css": "f388dca9a33c8b1034e4b67a73dce0298f48587b5efac774baaafc997be6f338",
+    "assets/index-_xRS93SE.js": "42147a3721bbf1f098f8e7a703cfc24602c040969b0a2ef7bf8a26dad366c8b4",
+    "fixtures/duplicate-headers.csv": "efb03c33f769395ff690d12c83f8f2e3e453684d38f227923a1d823090f83cc2",
+    "fixtures/formula-cells.csv": "f2ac9449a86ccc45a152e22fda4e20234ad47e06ffadd8f314935907b74e6b2a",
+    "fixtures/handoff-after.csv": "f6cd67cc537a2382f8265b23df7c1fd35470cb4dae1ad97019a3358f8848f34b",
+    "fixtures/handoff-before.csv": "e60053fa1ddd699d70c30d09b65337361ddde959b19697f982b7e35ce0e6bedf",
+    "fixtures/malformed-quotes.csv": "b8821fc44c5156540236c6278e4fbf7e9c7d7491d6fb175d43e1fbf026089156",
+    "fixtures/missing-empty-after.csv": "8694d6bfbacf74f0c26f14664d83f6115d4cefed9a77cfb8014c5f8bd47bab07",
+    "fixtures/missing-empty-before.csv": "3093b1d6b20fbb0d8c8e284ce1684d7ae9c87857fe495d9912b1980e9b76d15d",
+    "fixtures/README.md": "531d0bb19790328e1adcd83972f86ffd7c19516f0c7f7ce62d5ec60ab2b2e25a",
+    "index.html": "0856e26d7317c95aeadcae9c926654aa12d8d40cd7b7742bf4d0b0a2ea30932a",
+    "THIRD-PARTY-NOTICES.txt": "115c24e2c8425885fc368c7de97fd0892d36e9b2c6f1fb023ad96e7805c5474a"
+  }
+}

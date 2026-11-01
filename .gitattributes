@@ -1,5 +1,0 @@
-* text=auto eol=lf
-*.csv -text
-*.png -text
-*.zip -text
-*.cmd text eol=crlf
