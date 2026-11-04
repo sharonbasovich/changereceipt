@@ -11,6 +11,15 @@ type Props = {
   onCompare: (mapping: Mapping) => void
   error: string
 }
+/** Match the validator's trimmed-label equality without changing source headers. */
+function unusedLabel(preferred: string, fields: FieldMapping[]) {
+  const used = new Set(fields.map((field) => field.label.trim()))
+  let label = preferred
+  for (let suffix = 2; used.has(label.trim()); suffix++) {
+    label = `${preferred.trim()} (${suffix})`
+  }
+  return label
+}
 function columnLabel(header: string, index: number) {
   return header.length > 100
     ? `${header.slice(0, 60)}...${header.slice(-20)} [column ${index + 1}]`
@@ -72,7 +81,7 @@ export function MappingStep({ before, after, mapping, setMapping, onCompare, err
     before.headers.forEach((h, i) => {
       const j = after.headers.indexOf(h)
       if (j >= 0 && i !== mapping.beforeKey && j !== mapping.afterKey)
-        fields.push({ label: h, before: i, after: j })
+        fields.push({ label: unusedLabel(h, fields), before: i, after: j })
     })
     setMapping({ ...mapping, fields })
   }
@@ -205,7 +214,11 @@ export function MappingStep({ before, after, mapping, setMapping, onCompare, err
             ...mapping,
             fields: [
               ...mapping.fields,
-              { label: `Field ${mapping.fields.length + 1}`, before: null, after: null },
+              {
+                label: unusedLabel(`Field ${mapping.fields.length + 1}`, mapping.fields),
+                before: null,
+                after: null,
+              },
             ],
           })
         }
