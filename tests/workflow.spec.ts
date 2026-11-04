@@ -614,3 +614,32 @@ test('synthetic example loads only local assets and reset removes imported evide
     await page.evaluate(() => ({ local: localStorage.length, session: sessionStorage.length })),
   ).toEqual({ local: 0, session: 0 })
 })
+test('generated mapping labels stay unique without changing exact source headers', async ({
+  page,
+}) => {
+  const before = 'ID,Name, Name ,Name (2)\r\n001,A,B,C\r\n'
+  const after = 'ID,Name, Name ,Name (2)\r\n001,A,Updated,C\r\n'
+  await enterMapping(page, before, after)
+  await page.getByLabel('Before ID column', { exact: true }).selectOption({ label: 'ID' })
+  await page.getByLabel('After ID column', { exact: true }).selectOption({ label: 'ID' })
+  await page.getByRole('button', { name: 'Map same-named fields', exact: true }).click()
+  await capture(page, 'hosted-artifacts/generated-labels-desktop.png')
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  await capture(page, 'hosted-artifacts/generated-labels-mobile.png')
+  await page.getByRole('button', { name: 'Compare snapshots', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'A record of the handoff.' })).toBeVisible()
+  const result = await receipt(page)
+  expect(result.sources.before.rawText).toBe(before)
+  expect(result.sources.after.rawText).toBe(after)
+  expect(result.mapping.fields.map(({ before, after }) => [before, after])).toEqual([
+    [1, 1],
+    [2, 2],
+    [3, 3],
+  ])
+  expect(new Set(result.mapping.fields.map(({ label }) => label.trim())).size).toBe(3)
+  expect(result.comparison.summary.changed).toBe(1)
+  expect(result.comparison.entries[0].changes).toEqual([
+    { label: 'Name (2)', before: 'B', after: 'Updated' },
+  ])
+})
