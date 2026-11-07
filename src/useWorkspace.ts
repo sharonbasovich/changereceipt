@@ -20,12 +20,17 @@ export function useWorkspace(onInvalidate: () => void) {
     tokens.current.before++
     tokens.current.after++
     setSlots((s) => ({
-      before: s.before.busy ? { snapshot: s.before.snapshot, busy: false } : s.before,
-      after: s.after.busy ? { snapshot: s.after.snapshot, busy: false } : s.after,
+      before: s.before.busy ? { ...s.before, busy: false } : s.before,
+      after: s.after.busy ? { ...s.after, busy: false } : s.after,
     }))
   }
 
   function cancel(side: Side) {
+    if (demoAbort.current) {
+      stopDemo()
+      setNotice('Synthetic example canceled. Previous workspace kept.')
+      return
+    }
     stopDemo()
     tokens.current[side]++
     setSlots((s) => ({ ...s, [side]: { snapshot: s[side].snapshot, busy: false } }))
@@ -35,8 +40,8 @@ export function useWorkspace(onInvalidate: () => void) {
     onInvalidate()
   }
 
-  async function read(side: Side, file: File, demoSignal?: AbortSignal) {
-    if (!demoSignal) stopDemo()
+  async function read(side: Side, file: File) {
+    stopDemo()
     const token = ++tokens.current[side]
     onInvalidate()
     setNotice('')
@@ -46,9 +51,9 @@ export function useWorkspace(onInvalidate: () => void) {
       if (file.size > LIMITS.maxBytes)
         throw new Error('File exceeds the 2 MiB limit. Choose a smaller CSV.')
       const bytes = new Uint8Array(await file.arrayBuffer())
-      if (token !== tokens.current[side] || demoSignal?.aborted) return
+      if (token !== tokens.current[side]) return
       const snapshot = await importSnapshot(file.name, bytes)
-      if (token !== tokens.current[side] || demoSignal?.aborted) return
+      if (token !== tokens.current[side]) return
       setSlots((s) => ({ ...s, [side]: { snapshot, busy: false } }))
       setNotice(
         `${side === 'before' ? 'Before' : 'After'} snapshot imported. Choose the ID columns in the next step.`,
@@ -73,25 +78,55 @@ export function useWorkspace(onInvalidate: () => void) {
     stopDemo()
     const abort = new AbortController()
     demoAbort.current = abort
-    reset(false)
+    // Supersede pending imports, but retain the last validated pair and mapping
+    // until both example files are fetched, read and validated successfully.
+    tokens.current.before++
+    tokens.current.after++
+    setSlots((s) => ({
+      before: { ...s.before, busy: false },
+      after: { ...s.after, busy: false },
+    }))
     setNotice('Loading two synthetic snapshots…')
     try {
       const files = await loadDemoFiles(abort.signal)
-      if (!abort.signal.aborted)
-        await Promise.all([
-          read('before', files[0], abort.signal),
-          read('after', files[1], abort.signal),
-        ])
+      if (abort.signal.aborted) return
+      setSlots((s) => ({
+        before: { ...s.before, busy: true },
+        after: { ...s.after, busy: true },
+      }))
+      const snapshots = await Promise.all(
+        files.map(async (file) => {
+          if (file.size > LIMITS.maxBytes)
+            throw new Error('File exceeds the 2 MiB limit. Choose a smaller CSV.')
+          const bytes = new Uint8Array(await file.arrayBuffer())
+          if (abort.signal.aborted) return
+          return importSnapshot(file.name, bytes)
+        }),
+      )
+      if (abort.signal.aborted || !snapshots[0] || !snapshots[1]) return
+      onInvalidate()
+      setSlots({
+        before: { snapshot: snapshots[0], busy: false },
+        after: { snapshot: snapshots[1], busy: false },
+      })
+      setNotice('Synthetic snapshots imported. Choose the ID columns in the next step.')
     } catch (error) {
-      if (!abort.signal.aborted)
-        setNotice(error instanceof Error ? error.message : 'Synthetic files could not be loaded.')
+      if (!abort.signal.aborted) {
+        setSlots((s) => ({
+          before: { ...s.before, busy: false },
+          after: { ...s.after, busy: false },
+        }))
+        const reason =
+          error instanceof Error ? error.message : 'Synthetic files could not be loaded.'
+        setNotice(`${reason} Previous workspace kept.`)
+      }
     } finally {
       if (demoAbort.current === abort) demoAbort.current = null
     }
   }
 
-  function reset(abortDemo = true) {
-    if (abortDemo) stopDemo()
+  function reset() {
+    stopDemo()
     tokens.current.before++
     tokens.current.after++
     setSlots(emptySlots())

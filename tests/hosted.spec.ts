@@ -236,6 +236,36 @@ test('fixture fetch failure is announced and a repeated load recovers without pa
   expect((await receipt(page)).comparison.summary.ambiguous).toBe(1)
 })
 
+for (const failure of ['fetch', 'validation'] as const) {
+  test(`failed example ${failure} keeps the existing snapshots, mapping and receipt`, async ({
+    page,
+  }) => {
+    await loadAndCompare(page)
+    const original = await receipt(page)
+    await page.getByRole('button', { name: /Your snapshots/ }).click()
+    await page.route('**/changereceipt/fixtures/handoff-after.csv', (route) =>
+      route.fulfill({
+        status: failure === 'fetch' ? 503 : 200,
+        contentType: 'text/csv',
+        body: failure === 'fetch' ? 'Unavailable' : 'ID,Name\n1,"unclosed',
+      }),
+    )
+    await demoButton(page).click()
+    await expect(
+      page.getByRole('status').filter({ hasText: 'Previous workspace kept' }),
+    ).toBeVisible()
+    await expect(page.getByText('handoff-before.csv', { exact: true })).toBeVisible()
+    await expect(page.getByText('handoff-after.csv', { exact: true })).toBeVisible()
+    await expect(mapButton(page)).toBeEnabled()
+    await page.getByRole('button', { name: /Map the columns/ }).click()
+    await expect(page.getByLabel('Before ID column')).toHaveValue('0')
+    await expect(page.getByLabel('After ID column')).toHaveValue('0')
+    await expect(page.getByLabel('Field 3 label', { exact: true })).toHaveValue('Item')
+    await page.getByRole('button', { name: /Review & receipt/ }).click()
+    expect(await receipt(page)).toEqual(original)
+  })
+}
+
 test('actual imports, comparison and downloads transmit no CSV text or filenames and use only static GET requests', async ({
   page,
   context,
