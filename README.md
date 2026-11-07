@@ -52,6 +52,8 @@ The app uses React, TypeScript, Vite, and Papa Parse. It needs no account, crede
 
 Changing a source or mapping requires a new comparison. If a replacement import fails or is canceled, the last successfully imported snapshot is kept; select the ID columns and mappings again before comparing. A successful replacement supersedes the old snapshot. Reset clears the in-memory session. Reloading or closing the page also loses the session; download a receipt before leaving if you need to retain it.
 
+Loading the synthetic example replaces both snapshots only after the complete pair has loaded and passed validation. A failed or canceled example load keeps the previous snapshots, mapping and comparison. While its files are being fetched, you can still choose your own CSV to cancel that example request.
+
 ## Evidence and ambiguity rules
 
 - A nonempty identifier occurring more than once in either snapshot makes the entire identifier group ambiguous. The corresponding records on both sides remain together; none is silently counted as an added, removed, changed, or unchanged match.
